@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Define Wazuh Manager IP
+WAZUH_MANAGER="10.10.5.72"
+
+# Check if the script is run as root
+if [ "$EUID" -ne 0 ]; then
+  echo "Please run this script as root or use sudo."
+  exit 1
+fi
+
+# Import the GPG key
+sudo rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH
+
+# Add the Wazuh repository
+cat > /etc/yum.repos.d/wazuh.repo << EOF
+[wazuh]
+gpgcheck=1
+gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+enabled=1
+name=EL-\$releasever - Wazuh
+baseurl=https://packages.wazuh.com/4.x/yum/
+protect=1
+EOF
+
+# Install the Wazuh agent
+sudo WAZUH_MANAGER="$WAZUH_MANAGER" yum install -y wazuh-agent
+
+# Enable and start the Wazuh agent service
+sudo systemctl daemon-reload
+sudo systemctl enable wazuh-agent
+sudo systemctl start wazuh-agent
+
+# Print completion message
+echo "Wazuh agent installation and setup completed successfully. The agent is now connected to the Wazuh manager at $WAZUH_MANAGER."
+
