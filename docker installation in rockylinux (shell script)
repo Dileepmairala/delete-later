@@ -28,3 +28,7 @@ sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 
 echo "Docker and Docker Compose have been successfully installed."
+
+
+
+does change visualize in jenkins
